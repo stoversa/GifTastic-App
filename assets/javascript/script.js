@@ -16,12 +16,21 @@ function displayImg() {
     method: "GET"
   }).done(function(response) {
 
+  var results = response.data;
+  console.log(results);
 
     for (var x = 0; x < limit; x++){
+      //Note to self - add an alt text as an attr of the image
       var newDiv = $('<div>').addClass('float-left')
-      var imgSrc = response.data[x].images['fixed_height_still'].url;
-      var imgRating = $('<div>').text('Rating: ' + response.data[x].rating);
+      var imgSrc = results[x].images['fixed_height_still'].url;
+      var animatedSrc = results[x].images['fixed_height'].url
+      var imgRating = $('<div>').text('Rating: ' + results[x].rating);
       var newImg = $('<img>');
+
+      newImg.addClass('gif');
+      newImg.attr('data-state', 'still');
+      newImg.attr('data-still', imgSrc);
+      newImg.attr('data-animate', animatedSrc);
       newImg.attr('src', imgSrc);
       console.log(imgSrc);
       newDiv.append(newImg);
@@ -57,6 +66,27 @@ $("#add-image").on("click", function(event) {
 
 // event listeners to all elements with a class of "image"
 $(document).on("click", ".image", displayImg);
+
+//animates GIFs -- I'll need to update this; currently doesn't work
+$(document).on("click", ".gif", function() {
+
+    var thisImg = $(this);
+    var state = thisImg.attr('data-state');
+    var animateThis = thisImg.attr('data-animate');
+    var stillThis = thisImg.attr('data-still');
+
+    if(state === 'still'){
+        thisImg.attr('src', animateThis);
+        thisImg.attr('data-state', 'animate');
+    }
+    else{
+        thisImg.attr('src', stillThis);
+        thisImg.attr('data-state', 'still');
+    };
+
+});
+
+
 
 // Initial call to display button
 renderButtons();
